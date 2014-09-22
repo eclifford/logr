@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Logger</title>
+    <script src="logr.js"></script>
+  </head>
+  <body>
+
+  <script>
+      var dog = {
+        speak: function(name) {
+          console.log('woof woof ' + name);
+        },
+        bark: function() {
+          console.log('bark bark');
+        },
+        run: function(park) {
+          console.log('runs around ' + park);
+        },
+        goesToPark: function() {
+          dog.speak('fido');
+          dog.bark();
+          dog.run('point reyes');
+        },
+        tail: {
+          length: 10,
+          wag: function() {
+            console.log('wag wag');
+          }
+        }
+      };
+  </script>
+  </body>
+</html>

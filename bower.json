@@ -1,0 +1,21 @@
+{
+  "name": "logr",
+  "version": "0.0.1",
+  "main": "logr.js",
+  "description": "Logr is a JavaScript console logging replacement with support for dynamic object logging injection",
+  "homepage": "https://github.com/eclifford/logr",
+  "authors": [
+    "eclifford <ericgclifford@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}
