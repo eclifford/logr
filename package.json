@@ -1,5 +1,5 @@
 {
-  "name": "logr",
+  "name": "logr-js",
   "version": "0.0.1",
   "description": "Logr is a JavaScript console logging replacement with support for dynamic object logging injection",
   "author": "Eric Clifford <ericgclifford@gmail.com>",

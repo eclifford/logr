@@ -124,6 +124,17 @@ describe("logr", function() {
         expect(error_stub).to.have.not.been.called;
       });
     });
-
+    describe("attach()", function() {
+      var foo = {
+        baz: function() {},
+        bar: function() {}
+      };
+      it("should attach debug statements to object", function() {
+        var spy = sinon.spy(foo, "baz");
+        log1.attach(foo);
+        foo.baz();
+        expect(spy).to.have.been.called;
+      });
+    });
   });
 });

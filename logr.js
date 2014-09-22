@@ -30,11 +30,11 @@
     },
 
     levels: {
+      NONE: 0,
       DEBUG: 1,
       INFO: 2,
       WARN: 3,
-      ERROR: 4,
-      NONE: 9
+      ERROR: 4
     },
 
     // set the level for all stored logs
@@ -72,28 +72,33 @@
   //
   // @param [String] logname - the name of the log to create
   //
-  var Log = function(logname) {
+  var Log = function(logname, level) {
     this.logname = logname;
+    this.setLevel(level || Logr.defaults.level);
   };
 
+  // wrap console.debug
   Log.prototype.debug = function(msg) {
     if(this.getLevel() <= Logr.levels.DEBUG) {
       console.debug("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
+  // wrap console.info
   Log.prototype.info = function(msg) {
     if(this.getLevel() <= Logr.levels.INFO) {
       console.info("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
+  // wrap console.warn
   Log.prototype.warn = function(msg) {
     if(this.getLevel() <= Logr.levels.WARN) {
       console.warn("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
+  // warp console.error
   Log.prototype.error = function(msg) {
     if(this.getLevel() <= Logr.levels.ERROR) {
       console.error("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
@@ -111,6 +116,8 @@
     this.level = level;
   };
 
+  // gets the level for the log
+  //
   Log.prototype.getLevel = function() {
     if(sessionStorage) {
       return sessionStorage.getItem("logr:" + this.logname + ":level") || this.level;
@@ -118,6 +125,10 @@
     return this.level;
   };
 
+  // wrap the supplied object in grouped console statements
+  //
+  // @param [Object] obj - the object to attach logging to
+  //
   Log.prototype.attach = function(obj) {
     var prop, fn;
     var self = this;

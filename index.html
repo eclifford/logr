@@ -6,28 +6,26 @@
   <body>
 
   <script>
-      var dog = {
-        speak: function(name) {
-          console.log('woof woof ' + name);
-        },
-        bark: function() {
-          console.log('bark bark');
-        },
-        run: function(park) {
-          console.log('runs around ' + park);
-        },
-        goesToPark: function() {
-          dog.speak('fido');
-          dog.bark();
-          dog.run('point reyes');
-        },
-        tail: {
-          length: 10,
-          wag: function() {
-            console.log('wag wag');
-          }
-        }
-      };
+    var dog = {
+      bark: function() {
+        console.log('bark bark!');
+      },
+      run: function(name) {
+        console.log(name + ' runs around');
+      },
+      eat: function(name, food) {
+        console.log(name + ' eats ' + food);
+      }
+    };
+
+    var dogLog = Logr.log('dog');
+    dogLog.attach(dog);
+
+    dog.bark();
+
+    dog.run('rocket');
+
+    dog.eat('rocket', 'chicken');
   </script>
   </body>
 </html>
