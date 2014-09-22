@@ -7,3 +7,6 @@ before_install:
 install:
 - npm install
 - bower install
+env:
+  global:
+    secure: H11OJg5PFYv3XiLdng/L/xxti/Z7bK0kPFivd9w7NncIj+LvqEvbsR4yxuVcm/gizPz06e9hC9zIEAMmzVAMWW0OBQyY1p5jd13TzYpCuJv3W8FBa3rRdOL4TIlhkqGL0KU2AMMKyqZvOhdnw7UmijZIgUGlr9RMHBWafA0bpOE=
