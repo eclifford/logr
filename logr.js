@@ -73,6 +73,9 @@
   // @param [String] logname - the name of the log to create
   //
   var Log = function(logname, level) {
+    if(!logname) {
+      throw new Error("Logr.Log: logname is required");
+    }
     this.logname = logname;
     this.setLevel(level || Logr.defaults.level);
   };
@@ -136,18 +139,22 @@
       if (obj[prop] !== null && typeof obj[prop] === 'object') {
         this.attach(obj[prop]);
       }
-      if (typeof obj[prop] === 'function') {
+      if(typeof obj[prop] === 'function') {
         /*jshint -W083 */
         fn = obj[prop];
         obj[prop] = (function(prop, fn) {
           return function() {
             if(self.getLevel() <= Logr.levels.DEBUG) {
-              console.group("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
+              console.groupCollapsed("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
               console.time("time");
               var value = fn.apply(this, arguments);
+              // console.trace('trace');
+              if(value)
+                console.debug("return: " + value);
               console.timeEnd("time");
               console.groupEnd();
               return value;
+
             } else {
               return fn.apply(this, arguments);
             }

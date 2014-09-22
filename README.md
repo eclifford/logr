@@ -1,4 +1,4 @@
-# Logr [![Build Status](https://travis-ci.org/eclifford/logr.svg?branch=master)](https://travis-ci.org/eclifford/logr) [![Coverage Status](https://img.shields.io/coveralls/eclifford/logr.svg)](https://coveralls.io/r/eclifford/responsify?branch=master)
+# Logr [![Build Status](https://travis-ci.org/eclifford/logr.svg?branch=master)](https://travis-ci.org/eclifford/logr) [![Coverage Status](https://img.shields.io/coveralls/eclifford/logr.svg)](https://coveralls.io/r/eclifford/logr?branch=master)
 
 > Logr.js is a JavaScript console logging replacement with support for dynamic object logging injection.
 
@@ -68,7 +68,7 @@ return an existing logging instance of the same name or create you one.
 ```
 
 ```js
-  Logr.error("nothing to see here just the sky is falling", {foo: 'baz'});
+  log.error("nothing to see here just the sky is falling", {foo: 'baz'});
 ```
 
 ### Dynamic Object logs
@@ -90,6 +90,11 @@ baked into them for a visual timeline of the my call stack.
     },
     eat: function(name, food) {
       console.log(name + ' eats' + food);
+    },
+    today: function() {
+      this.bark();
+      this.run("rocket");
+      this.eat("rocket", "all the things");
     }  
   }
 ```
@@ -108,6 +113,17 @@ Then you simply execute your methods as you normally would.
 ```js
   dog.bark(); // bark() is executed wrapped in a console grouping statement
 ```
+
+![simple-example](http://cl.ly/image/040o2U1b3U09)
+
+Calling `today` which in turns calls all the other methods showcases our nested
+callstack.
+
+```js
+  dog.today();
+```
+
+![detailed-example](http://cl.ly/image/0I2l2Q423g2V)
 
 #### Dynamic logging levels
 
