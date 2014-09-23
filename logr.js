@@ -21,7 +21,7 @@
   'use strict';
 
   var Logr = {
-    version: '0.0.1',
+    version: '0.0.2',
 
     logs: {},
 
@@ -136,10 +136,10 @@
     var prop, fn;
     var self = this;
     for (prop in obj) {
-      if (obj[prop] !== null && typeof obj[prop] === 'object') {
+      if (obj !== null && Object.prototype.toString.call(obj[prop]) === "[object Object]") {
         this.attach(obj[prop]);
       }
-      if(typeof obj[prop] === 'function') {
+      else if(typeof obj[prop] === 'function') {
         /*jshint -W083 */
         fn = obj[prop];
         obj[prop] = (function(prop, fn) {
@@ -148,9 +148,9 @@
               console.groupCollapsed("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
               console.time("time");
               var value = fn.apply(this, arguments);
-              // console.trace('trace');
-              if(value)
-                console.debug("return: " + value);
+              if(value) {
+                console.debug("return: ", value);
+              }
               console.timeEnd("time");
               console.groupEnd();
               return value;

@@ -1,28 +1,41 @@
 # Logr [![Build Status](https://travis-ci.org/eclifford/logr.svg?branch=master)](https://travis-ci.org/eclifford/logr) [![Coverage Status](https://img.shields.io/coveralls/eclifford/logr.svg)](https://coveralls.io/r/eclifford/logr?branch=master)
 
-> Logr.js is a JavaScript console logging replacement with support for dynamic object logging injection.
+> Logr is a JavaScript console logging replacement with support for dynamic object logging injection.
 
 ## Why Logr?
 
-Logr is a simple contextual JavaScript logging utility for making sense of all the console logging statements
-in you application. Logr supports some innovative features for reducing the amount of boilerplate logging
-that you need to write and lets you access it only when you need it.
+Logr is a contextual JavaScript logging utility for making sense of all the console logging statements
+in your application. Logr supports some innovative features for reducing the amount of boilerplate logging
+that you need to write and makes this logging available to you only when you need it.
+
+**Example**
+
+Here is an example of automatic object logging on another framework of mine [responsify](https://github.com/eclifford/responsify).
+
+![responsify-example](http://f.cl.ly/items/200U1Z0v092j371g3k0o/Image%202014-09-23%20at%2012.51.22.png)
+
+Here is how easy it is.
+
+```js
+Logr.log('responsify').attach(Responsify)
+```
 
 ### Features
 
-- Automatically attach console.debug statements to all the methods of any object with `log.attach`
-- Contextually organize your logging statements with **Logr** logs
+- Automatically attach logging to all the methods of any object with `log.attach`
+- Contextually organize your logging statements named **Logr** logs
 - Programaticaly set logging levels globally or per log
 - Logging levels are stored per session allowing you to turn logging on and off in QA and Staging environments and have them stored for the
 entire browsing session
-- AMD and CommonJS compatible
+- **AMD** and **CommonJS** compatible
+- Fully supported in **Webkit** and **Gecko** won't break in IE
 
 ## Quick Start
 
 ### Installation with Bower
 
 ```bash
-bower install logr-js
+bower install logr.js
 ```
 
 ### Standard integration
@@ -40,8 +53,7 @@ bower install logr-js
 **Logr** may also be used via AMD
 
 ```js
-  define(['logr'], function(Logr){
-  })
+  define(['logr'], function(Logr){})
 ```
 
 ### Creating a log
@@ -73,12 +85,12 @@ return an existing logging instance of the same name or create you one.
 
 ### Dynamic Object logs
 
-The reason I created **Logr** was I wanted to avoid having to write the same boilerplate
+The reason I created **Logr** was that I wanted to avoid having to write the same boilerplate
 object method logging over and over again. It's verbose, ugly and difficult to manage. What I
-wanted was a way for all the methods on my object to have wrapping console statements
-baked into them for a visual timeline of the my call stack.
+wanted was a way for all the methods on my objects to be automatically wrapped in console statements
+outputting their inputs, outputs, order of execution and so on.
 
-#### Attaching to an object
+Take for example this simple dog API.
 
 ```js
   var dog = {
@@ -98,9 +110,7 @@ baked into them for a visual timeline of the my call stack.
     }  
   }
 ```
-
-Take for example this simple dog API. If I wanted to listen for all the events on this object
-complete with order of operation, nested grouping, parameters operated passed in.
+We start by creating a log and then attaching the `dog` object to our logger.
 
 ```js
   var dogLog = Logr.log('dog');
@@ -108,27 +118,32 @@ complete with order of operation, nested grouping, parameters operated passed in
   dogLog.attach(dog);
 ```
 
-Then you simply execute your methods as you normally would.
+Finally we call a method on the `dog` object.
 
 ```js
   dog.bark(); // bark() is executed wrapped in a console grouping statement
 ```
 
-![simple-example](http://cl.ly/image/040o2U1b3U09)
+Which in your **webkit/gecko** console will output the following.
 
-Calling `today` which in turns calls all the other methods showcases our nested
-callstack.
+![simple-example](http://f.cl.ly/items/1o3f1p2v310E2U0O283z/Image%202014-09-22%20at%2019.52.10.png)
+
+
+To see a more sophisticated example we can call the `today` method which in turns
+calls several other methods on the `dog` object.
 
 ```js
   dog.today();
 ```
 
-![detailed-example](http://cl.ly/image/0I2l2Q423g2V)
+![detailed-example](http://f.cl.ly/items/3F0n3E3E3o0K111h2J3A/Image%202014-09-22%20at%2019.52.47.png)
 
 #### Dynamic logging levels
 
-By default all **Logr** logging instances are created with a logging level of 1 or `DEBUG` meaning all
-logging messages will reach your browsers console. Changing your logging levels is simple.
+By default all **Logr** logging instances are created with a logging level of `DEBUG` meaning all
+logging messages will reach your browsers console.
+
+**Note:** all object logging is automatically set the debug level.
 
 ##### Setting logging level globally
 
@@ -154,12 +169,44 @@ Calling `Logr.setLevel` will apply the supplied level to each stored logging ins
   log1.setLevel(Logr.levels.ERROR); // all messages
 ```
 
-##### Logging levels and LocalStorage SessionState
+##### Logging levels and SessionStorage
 
-All log levels are stored in your browsers session state meaning page refreshes will
-return any stored logging level. This is useful in cases where you want to turn on and off
-logging levels in QA/Integration environment or simply filter your debugging logs down while
-working.
+All log levels are stored in your browsers **sessionStorage** meaning changes to
+**Logr**'s levels will persist until the end of the browser session. This is useful in cases
+where you want to turn on and off logging levels in QA/Integration environment or simply filter
+your debugging logs down while working.
+
+You can for example set your all of your logs to `ERROR` by default and lower their levels
+in real time to avoid log overload.
+
+**Example:**
+
+Say that I create three logs foo, baz, and bar. By default I set all their
+levels to `ERROR` only.
+
+```js
+  var foo = Logr.log('foo', Logr.levels.ERROR);
+  var baz = Logr.log('baz', Logr.levels.ERROR);
+  var bar = Logr.log('bar', Logr.levels.ERROR);
+
+  foo.attach(dog); // not seen as objects are always on DEBUG level
+  foo.warn('foo is getting angry'); // not seen
+  foo.error('foo is blowing up'); // seen
+```
+
+If at some point in the future I needed to see `INFO`, `WARN` or `DEBUG` messages
+I could set that globally or per log.
+
+In Chrome/Firefox's javascript console I could type the following.
+
+```js
+  Logr.log('foo').setLevel(Logr.levels.DEBUG); // sets foo log to DEBUG level
+```
+or
+
+```js
+  Logr.setLevel(Logr.levels.DEBUG); // sets all logs to DEBUG level
+```
 
 ### Contributing
 
