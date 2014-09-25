@@ -21,7 +21,7 @@
   'use strict';
 
   var Logr = {
-    version: '0.0.2',
+    version: '0.1.0',
 
     logs: {},
 
@@ -30,11 +30,11 @@
     },
 
     levels: {
-      NONE: 0,
       DEBUG: 1,
       INFO: 2,
       WARN: 3,
-      ERROR: 4
+      ERROR: 4,
+      NONE: 9
     },
 
     // set the level for all stored logs
@@ -54,17 +54,14 @@
     //
     // @param [String] logname - the name of the log to get or create
     //
-    log: function(logname) {
+    log: function(logname, options) {
       if(!logname) {
         throw Error("Logr.log: provide the name of the log to create or get");
       }
-      if(Logr.logs[logname]) {
-        return Logr.logs[logname];
-      } else {
-        var l = new Log(logname);
-        Logr.logs[logname] = l;
-        return l;
+      if(!Logr.logs[logname]) {
+        Logr.logs[logname] = new Log(logname, options);
       }
+      return Logr.logs[logname];
     }
   };
 
@@ -72,12 +69,14 @@
   //
   // @param [String] logname - the name of the log to create
   //
-  var Log = function(logname, level) {
+  var Log = function(logname, options) {
     if(!logname) {
       throw new Error("Logr.Log: logname is required");
     }
     this.logname = logname;
-    this.setLevel(level || Logr.defaults.level);
+    if(options) {
+       extend(this, Logr.defaults, options);
+    }
   };
 
   // wrap console.debug
@@ -108,7 +107,7 @@
     }
   };
 
-  // sets the level for the log
+  // set the session level for the log instance
   //
   // @param [Number] level - the level to set the log to
   //
@@ -116,10 +115,9 @@
     if(sessionStorage) {
       sessionStorage.setItem("logr:" + this.logname + ":level", level);
     }
-    this.level = level;
   };
 
-  // gets the level for the log
+  // get the session level or initial level for the log instance
   //
   Log.prototype.getLevel = function() {
     if(sessionStorage) {
@@ -163,6 +161,24 @@
       }
     }
   };
+
+  // Simple extend
+  //
+  // @param [Object] target - the target object to extend
+  // @param [Array] source - an array of object to extend the target with
+  //
+  function extend(obj) {
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasOwnProperty.call(source, prop)) {
+            obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
+  }
 
   return Logr;
 }));

@@ -23,7 +23,9 @@
       }
     };
 
-    var dogLog = Logr.log('dog');
+    var dogLog = Logr.log('dog', {
+      level: Logr.levels.DEBUG
+    });
     dogLog.attach(dog);
 
     dog.bark();
@@ -31,6 +33,10 @@
     dog.run('rocket');
 
     dog.eat('rocket', 'chicken');
+
+    dogLog.info('info test');
+    dogLog.warn('warn test');
+    dogLog.error('error test');
 
   </script>
   </body>

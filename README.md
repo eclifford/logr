@@ -141,13 +141,19 @@ calls several other methods on the `dog` object.
 #### Dynamic logging levels
 
 By default all **Logr** logging instances are created with a logging level of `DEBUG` meaning all
-logging messages will reach your browsers console.
+logging messages will reach your browsers console. You can override this by passing a level in the options
+during log instance creation.
+
+```js
+  var log = Logr.log('foo', { level: Logr.levels.ERROR }); // set the logger level to error and above
+```
 
 **Note:** all object logging is automatically set the debug level.
 
 ##### Setting logging level globally
 
-Calling `Logr.setLevel` will apply the supplied level to each stored logging instance.
+Calling `Logr.setLevel` will set the session based logging level for all stored instances. You should only call this from
+your browser to overwrite the initial level state.
 
 ```js
   Logr.setLevel(Logr.levels.NONE);  // no messages get through
@@ -158,6 +164,8 @@ Calling `Logr.setLevel` will apply the supplied level to each stored logging ins
 ```
 
 ##### Setting logging level per instance
+
+To set the session based logging level for a single instance simply call `setLevel` on that instance.
 
 ```js
   var log1 = Logr.log('log1');
@@ -177,7 +185,7 @@ where you want to turn on and off logging levels in QA/Integration environment o
 your debugging logs down while working.
 
 You can for example set your all of your logs to `ERROR` by default and lower their levels
-in real time to avoid log overload.
+from your browser to avoid log overload.
 
 **Example:**
 
@@ -185,9 +193,9 @@ Say that I create three logs foo, baz, and bar. By default I set all their
 levels to `ERROR` only.
 
 ```js
-  var foo = Logr.log('foo', Logr.levels.ERROR);
-  var baz = Logr.log('baz', Logr.levels.ERROR);
-  var bar = Logr.log('bar', Logr.levels.ERROR);
+  var foo = Logr.log('foo', { level: Logr.levels.ERROR });
+  var baz = Logr.log('baz', { level: Logr.levels.ERROR });
+  var bar = Logr.log('bar', { level: Logr.levels.ERROR });
 
   foo.attach(dog); // not seen as objects are always on DEBUG level
   foo.warn('foo is getting angry'); // not seen

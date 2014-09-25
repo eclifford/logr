@@ -136,5 +136,15 @@ describe("logr", function() {
         expect(spy).to.have.been.called;
       });
     });
+    describe("Log()", function() {
+      it("should be able to extend options", function() {
+        Logr.log('log4', {
+          level: 2
+        });
+        expect(Logr.log('log4').level).to.equal(2);
+        delete Logr.logs.log4;
+      });
+    });
+
   });
 });
