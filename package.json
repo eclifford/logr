@@ -1,6 +1,6 @@
 {
   "name": "logr.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Logr is a JavaScript console logging replacement with support for dynamic object logging injection",
   "author": "Eric Clifford <ericgclifford@gmail.com>",
   "main": "Gruntfile.js",

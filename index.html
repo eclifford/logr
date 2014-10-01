@@ -16,10 +16,16 @@
       eat: function(name, food) {
         console.log(name + ' eats ' + food);
       },
+      foo: function() {
+        this.bark();
+        var obj;
+        obj.test(); // throws TypeError
+      },
       today: function() {
         this.bark();
         this.run("rocket");
         this.eat("rocket", "all the things");
+        this.foo();
       }
     };
 
@@ -34,9 +40,10 @@
 
     dog.eat('rocket', 'chicken');
 
-    dogLog.info('info test');
-    dogLog.warn('warn test');
-    dogLog.error('error test');
+    // dogLog.info('info test');
+    // dogLog.warn('warn test');
+    // dog.today();
+    // dogLog.error('error test');
 
   </script>
   </body>

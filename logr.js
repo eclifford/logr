@@ -4,7 +4,7 @@
  *
  * Author: Eric Clifford
  * Email: ericgclifford@gmail.com
- * Date: 09.17.2014
+ * Date: 10.01.2014
  *
  */
 (function(root, factory) {
@@ -21,12 +21,13 @@
   'use strict';
 
   var Logr = {
-    version: '0.1.0',
+    version: '0.1.1',
 
     logs: {},
 
     defaults: {
-      level: 1
+      level: 1,
+      time: true 
     },
 
     levels: {
@@ -58,9 +59,11 @@
       if(!logname) {
         throw Error("Logr.log: provide the name of the log to create or get");
       }
+      // create a new log
       if(!Logr.logs[logname]) {
-        Logr.logs[logname] = new Log(logname, options);
+        Logr.logs[logname] = new Log(logname, options || {});
       }
+      // return an existing log
       return Logr.logs[logname];
     }
   };
@@ -71,38 +74,36 @@
   //
   var Log = function(logname, options) {
     if(!logname) {
-      throw new Error("Logr.Log: logname is required");
+      throw new Error("Logr.log: logname is required");
     }
     this.logname = logname;
-    if(options) {
-       extend(this, Logr.defaults, options);
-    }
+    extend(this, Logr.defaults, options || {});
   };
 
   // wrap console.debug
   Log.prototype.debug = function(msg) {
-    if(this.getLevel() <= Logr.levels.DEBUG) {
-      console.debug("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
+    if(root.console && root.console.debug && this.getLevel() <= Logr.levels.DEBUG) {
+      root.console.debug("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
   // wrap console.info
   Log.prototype.info = function(msg) {
-    if(this.getLevel() <= Logr.levels.INFO) {
-      console.info("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
+    if(root.console && root.console.info && this.getLevel() <= Logr.levels.INFO) {
+      root.console.info("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
   // wrap console.warn
   Log.prototype.warn = function(msg) {
-    if(this.getLevel() <= Logr.levels.WARN) {
+    if(root.console && root.console.warn && this.getLevel() <= Logr.levels.WARN) {
       console.warn("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
 
   // warp console.error
   Log.prototype.error = function(msg) {
-    if(this.getLevel() <= Logr.levels.ERROR) {
+    if(root.console && root.console.error && this.getLevel() <= Logr.levels.ERROR) {
       console.error("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
@@ -112,16 +113,16 @@
   // @param [Number] level - the level to set the log to
   //
   Log.prototype.setLevel = function(level) {
-    if(sessionStorage) {
-      sessionStorage.setItem("logr:" + this.logname + ":level", level);
+    if(root.sessionStorage) {
+      root.sessionStorage.setItem("logr:" + this.logname + ":level", level);
     }
   };
 
   // get the session level or initial level for the log instance
   //
   Log.prototype.getLevel = function() {
-    if(sessionStorage) {
-      return sessionStorage.getItem("logr:" + this.logname + ":level") || this.level;
+    if(root.sessionStorage) {
+      return root.sessionStorage.getItem("logr:" + this.logname + ":level") || this.level;
     }
     return this.level;
   };
@@ -131,28 +132,46 @@
   // @param [Object] obj - the object to attach logging to
   //
   Log.prototype.attach = function(obj) {
-    var prop, fn;
-    var self = this;
-    for (prop in obj) {
-      if (obj !== null && Object.prototype.toString.call(obj[prop]) === "[object Object]") {
+    var self = this,
+        prop, fn, value;
+
+    // without grouping methods no reason to continue
+    if(!root.console || !root.console.group)
+      return;
+
+    for(prop in obj) {
+      if(obj !== null && Object.prototype.toString.call(obj[prop]) === "[object Object]") {
         this.attach(obj[prop]);
       }
       else if(typeof obj[prop] === 'function') {
         /*jshint -W083 */
         fn = obj[prop];
+        var groupLevels = 0;
         obj[prop] = (function(prop, fn) {
           return function() {
             if(self.getLevel() <= Logr.levels.DEBUG) {
-              console.groupCollapsed("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
-              console.time("time");
-              var value = fn.apply(this, arguments);
-              if(value) {
-                console.debug("return: ", value);
-              }
-              console.timeEnd("time");
-              console.groupEnd();
-              return value;
+              root.console.groupCollapsed("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
+              groupLevels++;
+              if (self.time) root.console.time("time");
 
+              // attempt to call original method bubbling up any errors
+              try {
+                value = fn.apply(this, arguments);
+              }
+              // any error we find we break out of our console.group and
+              // provide full stack trace
+              catch(e) {
+                while(groupLevels--) root.console.groupEnd();
+                root.console.error(e.stack);
+                return;
+              }
+
+              if (value) root.console.debug("return: ", value);
+              if (self.time) root.console.timeEnd("time");
+
+              root.console.groupEnd();
+              groupLevels--;
+              return value;
             } else {
               return fn.apply(this, arguments);
             }

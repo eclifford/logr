@@ -45,6 +45,12 @@ describe("logr", function() {
       var l = Logr.log('log3');
       expect(l.logname).to.equal('log3');
     });
+
+    it("should use defaults if not provided overrides", function() {
+      var l = Logr.log('log4');
+      expect(l.level).to.equal(Logr.defaults.level);
+      delete Logr.logs.log4;
+    });
   });
 
   describe("Log", function() {
