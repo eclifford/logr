@@ -65,28 +65,13 @@ module.exports = function(grunt) {
       options: {
         files: ['package.json', 'bower.json'],
         updateConfigs: ['pkg'],
-        commit: false,
-        createTag: false,
-        push: false,
+        pushTo: 'origin',
         commitFiles: ['-a']
       }
     },
-    dox: {
-      options: {
-        title: "Logr documentation"
-      },
-      files: {
-        src: ['logr.js'],
-        dest: 'docs'
-      }
-    },
-    doxx: {
-      all: {
-        src: 'src',
-        target: 'docs',
-        options: {
-          // Task-specific options go here.
-        }
+    changelog: {
+      default: {
+        options: {}
       }
     }
   });
