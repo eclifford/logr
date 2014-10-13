@@ -4,7 +4,7 @@
  *
  * Author: Eric Clifford
  * Email: ericgclifford@gmail.com
- * Date: 10.01.2014
+ * Date: 10.13.2014
  *
  */
 (function(root, factory) {
@@ -27,7 +27,7 @@
 
     defaults: {
       level: 1,
-      time: true 
+      time: true
     },
 
     levels: {
@@ -37,100 +37,155 @@
       ERROR: 4,
       NONE: 9
     },
-
-    // set the level for all stored logs
-    //
-    // @param [Number] level - the level to set all the logs to
-    //
+    /**
+     * Set internal logging level for all logs
+     *
+     * @example
+     *     Logr.setLevel(Logr.levels.DEBUG)
+     *
+     * @param {Number} level the level to set the log to
+     * @api public
+     */
     setLevel: function(level) {
-      if(!level || isNaN(level)) {
-        throw Error("Logr.setLevel: provide a valid number for the level to set");
+      if (isNaN(level)) {
+        throw Error("Logr.setLevel(): expects parameter level of type Number");
       }
-      for(var log in Logr.logs) {
+      for (var log in Logr.logs) {
         Logr.logs[log].setLevel(level);
       }
     },
-
-    // get or create a log
-    //
-    // @param [String] logname - the name of the log to get or create
-    //
+    /**
+     * Get or create a contextual log instance
+     *
+     * @example
+     *     Logr.log('foo')
+     *
+     * @param {String} logname the name of the contextual log
+     * @param {Object} options the instance options
+     * @api public
+     */
     log: function(logname, options) {
-      if(!logname) {
-        throw Error("Logr.log: provide the name of the log to create or get");
+      if (typeof logname !== "string") {
+        throw Error("Logr.log(): expects parameter logname of type String");
       }
       // create a new log
-      if(!Logr.logs[logname]) {
+      if (!Logr.logs[logname]) {
         Logr.logs[logname] = new Log(logname, options || {});
       }
       // return an existing log
       return Logr.logs[logname];
     }
   };
-
-  // constructor for log object
-  //
-  // @param [String] logname - the name of the log to create
-  //
+  /**
+   * Log object constructor
+   *
+   * @example
+   *    var log = new Log('foo')
+   *
+   * @param {String} logname the name of the log instance
+   * @param {Object} options the instance options
+   */
   var Log = function(logname, options) {
-    if(!logname) {
-      throw new Error("Logr.log: logname is required");
+    if (!logname) {
+      throw new Error("Logr.Log: expects parameter logname of type String");
     }
     this.logname = logname;
     extend(this, Logr.defaults, options || {});
   };
-
-  // wrap console.debug
+  /**
+   * Browser safe `console.debug`
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.debug('debug info');
+   *
+   * @param {String} msg the message to pass to console
+   */
   Log.prototype.debug = function(msg) {
-    if(root.console && root.console.debug && this.getLevel() <= Logr.levels.DEBUG) {
+    if (root.console && root.console.debug && this.getLevel() <= Logr.levels.DEBUG) {
       root.console.debug("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
-
-  // wrap console.info
+  /**
+   * Browser safe `console.info`
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.info('info');
+   *
+   * @param {String} msg the message to pass to console
+   */
   Log.prototype.info = function(msg) {
-    if(root.console && root.console.info && this.getLevel() <= Logr.levels.INFO) {
+    if (root.console && root.console.info && this.getLevel() <= Logr.levels.INFO) {
       root.console.info("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
-
-  // wrap console.warn
+  /**
+   * Browser safe `console.warn`
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.warn('warn');
+   *
+   * @param {String} msg the message to pass to console
+   */
   Log.prototype.warn = function(msg) {
-    if(root.console && root.console.warn && this.getLevel() <= Logr.levels.WARN) {
+    if (root.console && root.console.warn && this.getLevel() <= Logr.levels.WARN) {
       console.warn("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
-
-  // warp console.error
+  /**
+   * Browser safe `console.error`
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.error('error');
+   *
+   * @param {String} msg the message to pass to console
+   */
   Log.prototype.error = function(msg) {
     if(root.console && root.console.error && this.getLevel() <= Logr.levels.ERROR) {
       console.error("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
-
-  // set the session level for the log instance
-  //
-  // @param [Number] level - the level to set the log to
-  //
+  /**
+   * Set the logging level for this instance
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.setLevel(Logr.levels.DEBUG);
+   *
+   * @param {Number} level the level to set the instance to
+   */
   Log.prototype.setLevel = function(level) {
-    if(root.sessionStorage) {
+    if (root.sessionStorage) {
       root.sessionStorage.setItem("logr:" + this.logname + ":level", level);
     }
   };
-
-  // get the session level or initial level for the log instance
-  //
+  /**
+   * Get the logging level for this instance
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.getLevel();
+   *
+   * @return {Number} the level to set the instance to
+   */
   Log.prototype.getLevel = function() {
-    if(root.sessionStorage) {
+    if (root.sessionStorage) {
       return root.sessionStorage.getItem("logr:" + this.logname + ":level") || this.level;
     }
     return this.level;
   };
-
-  // wrap the supplied object in grouped console statements
-  //
-  // @param [Object] obj - the object to attach logging to
-  //
+  /**
+   * Attach logging instance to object
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.attach({})
+   *
+   * @param {Object} obj the object to attach
+   */
   Log.prototype.attach = function(obj) {
     var self = this,
         prop, fn, value;
@@ -180,12 +235,14 @@
       }
     }
   };
-
-  // Simple extend
-  //
-  // @param [Object] target - the target object to extend
-  // @param [Array] source - an array of object to extend the target with
-  //
+  /**
+   * Extend obj with n-number of source objects
+   *
+   * @example
+   *    var log = Logr.extend({}, {});
+   *
+   * @param {Object} obj the object extend
+   */
   function extend(obj) {
     var source, prop;
     for (var i = 1, length = arguments.length; i < length; i++) {

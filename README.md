@@ -1,26 +1,10 @@
 # Logr [![Build Status](https://travis-ci.org/eclifford/logr.svg?branch=master)](https://travis-ci.org/eclifford/logr) [![Coverage Status](https://img.shields.io/coveralls/eclifford/logr.svg)](https://coveralls.io/r/eclifford/logr?branch=master)
 
-> Logr is a JavaScript console logging replacement with support for dynamic object logging injection.
-
-## Why Logr?
+Logr the dynamic console logging replacement.
 
 Logr is a contextual JavaScript logging utility for making sense of all the console logging statements
 in your application. Logr supports some innovative features for reducing the amount of boilerplate logging
 that you need to write and makes this logging available to you only when you need it.
-
-**Example**
-
-Here is an example of automatic object logging on another framework of mine [responsify](https://github.com/eclifford/responsify).
-
-![responsify-example](http://f.cl.ly/items/200U1Z0v092j371g3k0o/Image%202014-09-23%20at%2012.51.22.png)
-
-Here is how easy it is.
-
-```js
-Logr.log('responsify').attach(Responsify)
-```
-
-### Features
 
 - Automatically attach logging to all the methods of any object with `log.attach`
 - Contextually organize your logging statements named **Logr** logs
@@ -30,7 +14,9 @@ entire browsing session
 - **AMD** and **CommonJS** compatible
 - Fully supported in **Webkit** and **Gecko** won't break in IE
 
-## Quick Start
+![responsify-example](http://f.cl.ly/items/200U1Z0v092j371g3k0o/Image%202014-09-23%20at%2012.51.22.png)
+
+## Getting Started
 
 ### Installation with Bower
 
@@ -53,7 +39,7 @@ bower install logr.js
 **Logr** may also be used via AMD
 
 ```js
-  define(['logr'], function(Logr){})
+define(['logr'], function(Logr){})
 ```
 
 ### Creating a log
@@ -62,25 +48,25 @@ bower install logr.js
 return an existing logging instance of the same name or create you one.
 
 ```js
-  var log = Logr.log('foo'); // creates a logging instance of the name foo
+var log = Logr.log('foo'); // creates a logging instance of the name foo
 ```
 
-### Simple logging
+#### Simple logging
 
 ```js
-  log.debug("nothing to see here just debugging", {foo: 'baz'});
-```
-
-```js
-  log.info("nothing to see here just sending some information", {foo: 'baz'});
+log.debug("nothing to see here just debugging", {foo: 'baz'});
 ```
 
 ```js
-  log.warn("nothing to see here just warning you", {foo: 'baz'});
+log.info("nothing to see here just sending some information", {foo: 'baz'});
 ```
 
 ```js
-  log.error("nothing to see here just the sky is falling", {foo: 'baz'});
+log.warn("nothing to see here just warning you", {foo: 'baz'});
+```
+
+```js
+log.error("nothing to see here just the sky is falling", {foo: 'baz'});
 ```
 
 ### Dynamic Object logs

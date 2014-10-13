@@ -70,6 +70,24 @@ module.exports = function(grunt) {
         push: false,
         commitFiles: ['-a']
       }
+    },
+    dox: {
+      options: {
+        title: "Logr documentation"
+      },
+      files: {
+        src: ['logr.js'],
+        dest: 'docs'
+      }
+    },
+    doxx: {
+      all: {
+        src: 'src',
+        target: 'docs',
+        options: {
+          // Task-specific options go here.
+        }
+      }
     }
   });
 
