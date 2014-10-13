@@ -1,12 +1,29 @@
 {
   "name": "logr.js",
-  "version": "0.1.1",
   "description": "Logr is a JavaScript console logging replacement with support for dynamic object logging injection",
-  "author": "Eric Clifford <ericgclifford@gmail.com>",
-  "main": "Gruntfile.js",
-  "directories": {
-    "test": "test"
+  "homepage": "http://eclifford.github.io/logr/",
+  "version": "0.1.1",
+  "keywords": [
+    "logging",
+    "javascript",
+    "console"
+  ],
+  "author": {
+    "name": "Eric Clifford",
+    "email": "erigclifford@gmail.com"
   },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    ".travis.yml",
+    ".coveralls.yml",
+    "package.json",
+    "Gruntfile.js",
+    ".gitignore"
+  ],
   "scripts": {
     "test": "grunt karma:ci"
   },
@@ -14,11 +31,9 @@
     "type": "git",
     "url": "https://github.com/eclifford/logr.git"
   },
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/eclifford/logr/issues"
   },
-  "homepage": "https://github.com/eclifford/logr",
   "devDependencies": {
     "chai": "^1.9.1",
     "grunt": "^0.4.5",
@@ -26,6 +41,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-conventional-changelog": "^1.1.0",
     "grunt-karma": "^0.8.3",
     "grunt-text-replace": "^0.3.12",
     "karma": "^0.12.23",

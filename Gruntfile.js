@@ -97,7 +97,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-conventional-changelog');
 
-  grunt.registerTask('build', ['jshint', 'bump', 'replace', 'uglify']);
-
+  grunt.registerTask('release', 'Build and release plugin', function(type) {
+    grunt.task.run([
+      "jshint",
+      "bump-only:" + type || "patch",
+      "replace",
+      "uglify",
+      "changelog",
+      "bump-commit"
+    ]);
+  });
 };
