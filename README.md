@@ -1,4 +1,5 @@
 # Logr [![Build Status](https://travis-ci.org/eclifford/logr.svg?branch=master)](https://travis-ci.org/eclifford/logr) [![Coverage Status](https://img.shields.io/coveralls/eclifford/logr.svg)](https://coveralls.io/r/eclifford/logr?branch=master)
+[http://eclifford.github.io/logr/](http://eclifford.github.io/logr/)
 
 Logr the dynamic console logging replacement.
 

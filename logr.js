@@ -18,7 +18,7 @@
     root.Logr = factory(root);
   }
 }(this, function(root) {
-  'use strict';
+  // 'use strict';
 
   var Logr = {
     version: '0.1.2',
@@ -26,8 +26,7 @@
     logs: {},
 
     defaults: {
-      level: 1,
-      time: true
+      level: 1
     },
 
     levels: {
@@ -144,7 +143,7 @@
    * @param {String} msg the message to pass to console
    */
   Log.prototype.error = function(msg) {
-    if(root.console && root.console.error && this.getLevel() <= Logr.levels.ERROR) {
+    if (root.console && root.console.error && this.getLevel() <= Logr.levels.ERROR) {
       console.error("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
     }
   };
@@ -191,49 +190,51 @@
         prop, fn, value;
 
     // without grouping methods no reason to continue
-    if(!root.console || !root.console.group)
-      return;
+    if (!root.console || !root.console.group) return;
 
-    for(prop in obj) {
-      if(obj !== null && Object.prototype.toString.call(obj[prop]) === "[object Object]") {
-        this.attach(obj[prop]);
-      }
-      else if(typeof obj[prop] === 'function') {
-        /*jshint -W083 */
-        fn = obj[prop];
-        var groupLevels = 0;
-        obj[prop] = (function(prop, fn) {
-          return function() {
-            if(self.getLevel() <= Logr.levels.DEBUG) {
-              root.console.groupCollapsed("[" + self.logname + "] " + prop + "()", [].slice.call(arguments));
-              groupLevels++;
-              if (self.time) root.console.time("time");
-
-              // attempt to call original method bubbling up any errors
-              try {
-                value = fn.apply(this, arguments);
-              }
-              // any error we find we break out of our console.group and
-              // provide full stack trace
-              catch(e) {
-                while(groupLevels--) root.console.groupEnd();
-                root.console.error(e.stack);
-                return;
-              }
-
-              if (value) root.console.debug("return: ", value);
-              if (self.time) root.console.timeEnd("time");
-
-              root.console.groupEnd();
-              groupLevels--;
-              return value;
-            } else {
-              return fn.apply(this, arguments);
-            }
-          };
-        })(prop, fn);
+    // enumerate all properties on object proxing all functions except the constructor
+    for (prop in obj) {
+      if (obj.hasOwnProperty(prop) && typeof obj[prop] === 'function' && prop !== 'constructor') {
+        obj[prop] = self.wrap(obj, prop, obj[prop]);
       }
     }
+  };
+  /**
+   * Wrap original function with custom logging logic
+   *
+   * @example
+   *    var log = Logr.log('foo');
+   *    log.attach({})
+   *
+   * @param {Object} obj the object to attach
+   */
+  Log.prototype.wrap = function(obj, prop, fn) {
+    var self = this;
+
+    return function logr() {
+      if (self.getLevel() <= Logr.levels.DEBUG) {
+        // attempt to call original method bubbling up any errors
+        try {
+          root.console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()", [].slice.call(arguments));
+          value = fn.apply(this, arguments);
+        }
+        // any error we find we break out of our console.group and
+        // provide full stack trace
+        catch(e) {
+          var count = 15;
+          while(count--) root.console.groupEnd();
+          root.console.error(e.stack);
+          return;
+        }
+
+        if (value) root.console.info("return: ", value);
+
+        root.console.groupEnd();
+        return value;
+      } else {
+        return fn.apply(this, arguments);
+      }
+    };
   };
   /**
    * Extend obj with n-number of source objects
