@@ -64,7 +64,6 @@ module.exports = function(grunt) {
     bump: {
       options: {
         files: ['package.json', 'bower.json'],
-        updateConfigs: ['pkg'],
         pushTo: 'origin',
         commitFiles: ['-a']
       }
@@ -87,7 +86,7 @@ module.exports = function(grunt) {
   grunt.registerTask('release', 'Build and release plugin', function(type) {
     grunt.task.run([
       "jshint",
-      "bump-only:" + type || "patch",
+      "bump-only:" + (type || 'patch'),
       "replace",
       "uglify",
       "changelog",
