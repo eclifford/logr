@@ -47,7 +47,7 @@
      */
     setLevel: function(level) {
       if (isNaN(level)) {
-        throw Error("Logr.setLevel(): expects parameter level of type Number");
+        throw new Error("Logr.setLevel(): expects parameter level of type Number");
       }
       for (var log in Logr.logs) {
         Logr.logs[log].setLevel(level);
@@ -65,7 +65,7 @@
      */
     log: function(logname, options) {
       if (typeof logname !== "string") {
-        throw Error("Logr.log(): expects parameter logname of type String");
+        throw new Error("Logr.log(): expects parameter logname of type String");
       }
       // create a new log
       if (!Logr.logs[logname]) {
@@ -85,7 +85,7 @@
    * @param {Object} options the instance options
    */
   var Log = function(logname, options) {
-    if (!logname) {
+    if (typeof logname !== 'string') {
       throw new Error("Logr.Log: expects parameter logname of type String");
     }
     this.logname = logname;
@@ -195,7 +195,7 @@
     // enumerate all properties on object proxing all functions except the constructor
     for (prop in obj) {
       if (obj.hasOwnProperty(prop) && typeof obj[prop] === 'function' && prop !== 'constructor') {
-        obj[prop] = self.wrap(obj, prop, obj[prop]);
+        self.wrap(obj, prop);
       }
     }
   };
@@ -208,15 +208,18 @@
    *
    * @param {Object} obj the object to attach
    */
-  Log.prototype.wrap = function(obj, prop, fn) {
-    var self = this;
+  Log.prototype.wrap = function(obj, prop) {
+    var self = this,
+        func;
 
-    return function logr() {
+    func = obj[prop];
+
+    obj[prop] = function logr() {
       if (self.getLevel() <= Logr.levels.DEBUG) {
         // attempt to call original method bubbling up any errors
         try {
           root.console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()", [].slice.call(arguments));
-          value = fn.apply(this, arguments);
+          value = func.apply(this, arguments);
         }
         // any error we find we break out of our console.group and
         // provide full stack trace
@@ -232,7 +235,7 @@
         root.console.groupEnd();
         return value;
       } else {
-        return fn.apply(this, arguments);
+        return func.apply(this, arguments);
       }
     };
   };

@@ -142,6 +142,33 @@ describe("logr", function() {
         expect(spy).to.have.been.called;
       });
     });
+    describe("wrap()", function() {
+      it("should wrap an existing object method", function() {
+        var foo = {
+          baz: function() { return 'baz'; }
+        };
+        var stub = sinon.stub(console, "info");
+        var spy = sinon.spy(foo, 'baz');
+        log1.wrap(foo, 'baz', spy);
+        log1.setLevel(1);
+        foo.baz();
+        expect(spy).to.have.been.called;
+        stub.restore();
+      });
+      it("should handle errors", function() {
+        var foo = {
+          baz: function() { throw new Error('hi'); }
+        };
+        var stub = sinon.stub(console, "error");
+        log1.wrap(foo, 'baz');
+        log1.setLevel(1);
+        foo.baz();
+        expect(function() {
+          foo.baz();
+        }).to.not.throw();
+        stub.restore();
+      });
+    });
     describe("Log()", function() {
       it("should be able to extend options", function() {
         Logr.log('log4', {
