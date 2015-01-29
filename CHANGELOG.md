@@ -1,3 +1,17 @@
+<a name="0.1.4"></a>
+### 0.1.4 (2015-01-28)
+
+
+#### Bug Fixes
+
+* **Logr:** fix for grunt:release and readme ((94d5b8a5))
+
+
+#### Features
+
+* **logr:** adding line numbers ((48f3c9ae))
+
+
 <a name="0.1.3"></a>
 ### 0.1.3 (2015-01-28)
 
