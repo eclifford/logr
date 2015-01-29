@@ -15,7 +15,7 @@
     "test"
   ],
   "devDependencies": {
+    "es5-shim": "~4.0.5"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

@@ -46,6 +46,7 @@
     "grunt-text-replace": "^0.3.12",
     "karma": "^0.12.23",
     "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.7",
     "karma-coverage": "^0.2.6",
     "karma-coveralls": "^0.1.4",
     "karma-jquery": "^0.1.0",

@@ -90,61 +90,30 @@
     }
     this.logname = logname;
     extend(this, Logr.defaults, options || {});
+
+    // setup the console logging
+    this.init();
   };
   /**
-   * Browser safe `console.debug`
-   *
-   * @example
-   *    var log = Logr.log('foo');
-   *    log.debug('debug info');
-   *
-   * @param {String} msg the message to pass to console
-   */
-  Log.prototype.debug = function(msg) {
-    if (root.console && root.console.debug && this.getLevel() <= Logr.levels.DEBUG) {
-      root.console.debug("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
-    }
-  };
-  /**
-   * Browser safe `console.info`
-   *
-   * @example
-   *    var log = Logr.log('foo');
-   *    log.info('info');
-   *
-   * @param {String} msg the message to pass to console
-   */
-  Log.prototype.info = function(msg) {
-    if (root.console && root.console.info && this.getLevel() <= Logr.levels.INFO) {
-      root.console.info("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
-    }
-  };
-  /**
-   * Browser safe `console.warn`
-   *
-   * @example
-   *    var log = Logr.log('foo');
-   *    log.warn('warn');
-   *
-   * @param {String} msg the message to pass to console
-   */
-  Log.prototype.warn = function(msg) {
-    if (root.console && root.console.warn && this.getLevel() <= Logr.levels.WARN) {
-      console.warn("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
-    }
-  };
-  /**
-   * Browser safe `console.error`
-   *
-   * @example
-   *    var log = Logr.log('foo');
-   *    log.error('error');
-   *
-   * @param {String} msg the message to pass to console
-   */
-  Log.prototype.error = function(msg) {
-    if (root.console && root.console.error && this.getLevel() <= Logr.levels.ERROR) {
-      console.error("[" + this.logname + "] " + msg, [].slice.call(arguments).splice(1,1));
+  * Initialize Logr
+  */
+  Log.prototype.init = function() {
+    var logs = [
+      "trace",
+      "debug",
+      "warn",
+      "info",
+      "error"
+    ],
+    noop = function() {};
+
+    // proxy all console calls to real methods
+    for (var i = 0; i < logs.length; i++) {
+      if (root.console && root.console.bind && root.console[logs[i]] && this.getLevel() <= Logr.levels[logs[i].toUpperCase()]) {
+        this[logs[i]] = console[logs[i]].bind(console, "[" + this.logname + "]");
+      } else {
+        this[logs[i]] = noop;
+      }
     }
   };
   /**
@@ -160,6 +129,7 @@
     if (root.sessionStorage) {
       root.sessionStorage.setItem("logr:" + this.logname + ":level", level);
     }
+    this.level = level;
   };
   /**
    * Get the logging level for this instance
@@ -200,6 +170,30 @@
     }
   };
   /**
+   * Process exception and return formatted output
+   *
+   * @param {Exception} e the exception to format
+  */
+  Log.prototype.processException = function(e) {
+    if (e.stack && !e.fileName) {
+      return (e.stack + '\n')
+        .replace(/^[\s\S]+?\s+at\s+/, ' at ') // remove message
+        .replace(/^\s+(at eval )?at\s+/gm, '') // remove 'at' and indentation
+        .replace(/^([^\(]+?)([\n$])/gm, '{anonymous}() ($1)$2')
+        .replace(/^Object.<anonymous>\s*\(([^\)]+)\)/gm, '{anonymous}() ($1)')
+        .replace(/^(.+) \((.+)\)$/gm, '$1@$2')
+        .split('\n')
+        .slice(0, -1);
+    }
+
+    if (e.stack && e.fileName) {
+      return e.stack
+        .replace(/(?:\n@:0)?\s+$/m, '')
+        .replace(/^(?:\((\S*)\))?@/gm, '{anonymous}($1)@')
+        .split('\n');
+    }
+  };
+  /**
    * Wrap original function with custom logging logic
    *
    * @example
@@ -215,10 +209,20 @@
     func = obj[prop];
 
     obj[prop] = function logr() {
+      var stackMessage = [];
+
       if (self.getLevel() <= Logr.levels.DEBUG) {
+
+        // force an exception to get original calling location
+        try {
+          this.undef();
+        } catch (e) {
+          stackMessage = self.processException(e);
+        }
+
         // attempt to call original method bubbling up any errors
         try {
-          root.console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()", [].slice.call(arguments));
+          root.console.groupCollapsed("[" + self.logname + "] " + stackMessage[1], [].slice.call(arguments));
           value = func.apply(this, arguments);
         }
         // any error we find we break out of our console.group and
@@ -230,8 +234,8 @@
           return;
         }
 
+        root.console.info("arguments", [].slice.call(arguments));
         if (value) root.console.info("return: ", value);
-
         root.console.groupEnd();
         return value;
       } else {
