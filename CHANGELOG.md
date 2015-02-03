@@ -1,4 +1,13 @@
 <a name="0.1.4"></a>
+### 0.1.4 (2015-02-03)
+
+
+#### Features
+
+* **Logr:** added accurate line numbers ((66e10590))
+
+
+<a name="0.1.4"></a>
 ### 0.1.4 (2015-01-28)
 
 
