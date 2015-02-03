@@ -174,24 +174,34 @@
    *
    * @param {Exception} e the exception to format
   */
-  Log.prototype.processException = function(e) {
-    if (e.stack && !e.fileName) {
-      return (e.stack + '\n')
-        .replace(/^[\s\S]+?\s+at\s+/, ' at ') // remove message
-        .replace(/^\s+(at eval )?at\s+/gm, '') // remove 'at' and indentation
-        .replace(/^([^\(]+?)([\n$])/gm, '{anonymous}() ($1)$2')
-        .replace(/^Object.<anonymous>\s*\(([^\)]+)\)/gm, '{anonymous}() ($1)')
-        .replace(/^(.+) \((.+)\)$/gm, '$1@$2')
-        .split('\n')
-        .slice(0, -1);
+  Log.prototype.getExceptionLineNumber = function(e) {
+    var result = [];
+
+    // safari
+    if (e.stack && e.sourceURL) {
+      result = e.stack.match(/@.*/g);
+      return result ? result[1] : "";
     }
 
+    // firefox
     if (e.stack && e.fileName) {
-      return e.stack
-        .replace(/(?:\n@:0)?\s+$/m, '')
-        .replace(/^(?:\((\S*)\))?@/gm, '{anonymous}($1)@')
-        .split('\n');
+      result = e.stack.match(/@.*/g);
+      return result ? result[1] : "";
     }
+
+    // ie
+    if (e.stack && e.number) {
+      result = e.stack.match(/@.*/g);
+      return result ? result[1] : "";
+    }
+
+    // chrome
+    if (e.stack) {
+      result = e.stack.match(/\(.*\)/g);
+      return result ? result[1] : "";
+    }
+
+    return "";
   };
   /**
    * Wrap original function with custom logging logic
@@ -209,7 +219,7 @@
     func = obj[prop];
 
     obj[prop] = function logr() {
-      var stackMessage = [];
+      var stackMessage = "";
 
       if (self.getLevel() <= Logr.levels.DEBUG) {
 
@@ -217,12 +227,13 @@
         try {
           this.undef();
         } catch (e) {
-          stackMessage = self.processException(e);
+          stackMessage = self.getExceptionLineNumber(e);
         }
 
         // attempt to call original method bubbling up any errors
         try {
-          root.console.groupCollapsed("[" + self.logname + "] " + stackMessage[1], [].slice.call(arguments));
+          root.console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()" + " " + stackMessage);
+          root.console.log("arguments: ", [].slice.call(arguments));
           value = func.apply(this, arguments);
         }
         // any error we find we break out of our console.group and
@@ -234,8 +245,7 @@
           return;
         }
 
-        root.console.info("arguments", [].slice.call(arguments));
-        if (value) root.console.info("return: ", value);
+        if (value) root.console.log("return: ", value);
         root.console.groupEnd();
         return value;
       } else {
