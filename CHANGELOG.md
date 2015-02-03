@@ -6,6 +6,10 @@
 ### 0.1.5 (2015-02-03)
 
 
+<a name="0.1.5"></a>
+### 0.1.5 (2015-02-03)
+
+
 #### Features
 
 * **Logr:** added accurate line numbers ((66e10590))
