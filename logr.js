@@ -30,7 +30,7 @@
     },
 
     levels: {
-      DEBUG: 1,
+      LOG: 1,
       INFO: 2,
       WARN: 3,
       ERROR: 4,
@@ -99,22 +99,24 @@
   */
   Log.prototype.init = function() {
     var logs = [
-      "trace",
-      "debug",
-      "warn",
+      "log",
       "info",
+      "warn",
       "error"
     ],
     noop = function() {};
 
     // proxy all console calls to real methods
     for (var i = 0; i < logs.length; i++) {
-      if (root.console && root.console.bind && root.console[logs[i]] && this.getLevel() <= Logr.levels[logs[i].toUpperCase()]) {
-        this[logs[i]] = console[logs[i]].bind(console, "[" + this.logname + "]");
+      if (console && console[logs[i]] && this.getLevel() <= Logr.levels[logs[i].toUpperCase()]) {
+        this[logs[i]] = Function.prototype.bind.call(console[logs[i]], console, "[" + this.logname + "]");
       } else {
         this[logs[i]] = noop;
       }
     }
+
+    // backwards compatibility
+    this.debug = this.log;
   };
   /**
    * Set the logging level for this instance
@@ -130,6 +132,7 @@
       root.sessionStorage.setItem("logr:" + this.logname + ":level", level);
     }
     this.level = level;
+    this.init();
   };
   /**
    * Get the logging level for this instance
@@ -158,9 +161,6 @@
   Log.prototype.attach = function(obj) {
     var self = this,
         prop, fn, value;
-
-    // without grouping methods no reason to continue
-    if (!root.console || !root.console.group) return;
 
     // enumerate all properties on object proxing all functions except the constructor
     for (prop in obj) {
@@ -221,7 +221,7 @@
     obj[prop] = function logr() {
       var stackMessage = "";
 
-      if (self.getLevel() <= Logr.levels.DEBUG) {
+      if (self.getLevel() <= Logr.levels.LOG) {
 
         // force an exception to get original calling location
         try {
@@ -230,23 +230,30 @@
           stackMessage = self.getExceptionLineNumber(e);
         }
 
-        // attempt to call original method bubbling up any errors
-        try {
-          root.console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()" + " " + stackMessage);
-          root.console.log("arguments: ", [].slice.call(arguments));
+        // grouping supported?
+        if (console.group) {
+          // attempt to call original method bubbling up any errors
+          try {
+            console.groupCollapsed("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()" + " " + stackMessage);
+            console.log("arguments: ", [].slice.call(arguments));
+            value = func.apply(this, arguments);
+          }
+          // any error we find we break out of our console.group and
+          // provide full stack trace
+          catch(e) {
+            var count = 15;
+            while(count--) console.groupEnd();
+            console.error(e.stack);
+            return;
+          }
+
+          if (value) console.log("return: ", value);
+          console.groupEnd();
+        } else {
+          console.log("[" + self.logname + "] " + obj.constructor.name + "." + prop + "()" + " " + stackMessage);
           value = func.apply(this, arguments);
         }
-        // any error we find we break out of our console.group and
-        // provide full stack trace
-        catch(e) {
-          var count = 15;
-          while(count--) root.console.groupEnd();
-          root.console.error(e.stack);
-          return;
-        }
 
-        if (value) root.console.log("return: ", value);
-        root.console.groupEnd();
         return value;
       } else {
         return func.apply(this, arguments);

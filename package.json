@@ -49,6 +49,7 @@
     "karma-chrome-launcher": "^0.1.7",
     "karma-coverage": "^0.2.6",
     "karma-coveralls": "^0.1.4",
+    "karma-es5-shim": "0.0.4",
     "karma-jquery": "^0.1.0",
     "karma-mocha": "^0.1.4",
     "karma-phantomjs-launcher": "^0.1.4",

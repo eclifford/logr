@@ -21,7 +21,7 @@ module.exports = function(grunt) {
     },
     karma: {
       options: {
-        frameworks: ['mocha', 'chai', 'jquery-2.1.0', 'sinon-chai'],
+        frameworks: ['mocha', 'chai', 'jquery-2.1.0', 'es5-shim', 'sinon-chai'],
 
         files: [
           'logr.js',
