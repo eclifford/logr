@@ -1,3 +1,12 @@
+<a name="0.1.6"></a>
+### 0.1.6 (2015-02-06)
+
+
+#### Features
+
+* **Logr:** added node logging support ((d3fc8ba0))
+
+
 <a name="0.1.5"></a>
 ### 0.1.5 (2015-02-03)
 
