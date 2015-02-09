@@ -2,7 +2,7 @@
   "name": "logr.js",
   "description": "Logr is a JavaScript console logging replacement with support for dynamic object logging injection",
   "homepage": "http://eclifford.github.io/logr/",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "keywords": [
     "logging",
     "javascript",
