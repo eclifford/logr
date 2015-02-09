@@ -12,6 +12,7 @@
     "name": "Eric Clifford",
     "email": "erigclifford@gmail.com"
   },
+  "main": "logr.js",
   "license": "MIT",
   "ignore": [
     "**/.*",
