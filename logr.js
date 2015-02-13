@@ -164,7 +164,12 @@
 
     // enumerate all properties on object proxing all functions except the constructor
     for (prop in obj) {
-      if (obj.hasOwnProperty(prop) && typeof obj[prop] === 'function' && prop !== 'constructor') {
+      if (prop !== null && typeof obj[prop] === 'object') {
+        self.attach(obj[prop]);
+        continue;
+      }
+      // wrap functions that aren't by convention Constructors
+      if (obj[prop] && typeof obj[prop] === 'function' && !(/^[A-Z]/g.test(prop))) {
         self.wrap(obj, prop);
       }
     }
