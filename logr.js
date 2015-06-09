@@ -25,9 +25,7 @@
 
     logs: {},
 
-    defaults: {
-      level: 1
-    },
+    currentLevel: 1,
 
     levels: {
       LOG: 1,
@@ -49,6 +47,9 @@
       if (isNaN(level)) {
         throw new Error("Logr.setLevel(): expects parameter level of type Number");
       }
+
+      Logr.currentLevel = level;
+
       for (var log in Logr.logs) {
         Logr.logs[log].setLevel(level);
       }
@@ -89,7 +90,6 @@
       throw new Error("Logr.Log: expects parameter logname of type String");
     }
     this.logname = logname;
-    extend(this, Logr.defaults, options || {});
 
     // setup the console logging
     this.init();
@@ -145,9 +145,9 @@
    */
   Log.prototype.getLevel = function() {
     if (root.sessionStorage) {
-      return root.sessionStorage.getItem("logr:" + this.logname + ":level") || this.level;
+      sessionLevel = root.sessionStorage.getItem("logr:" + this.logname + ":level");
     }
-    return this.level;
+    return sessionLevel || this.level || Logr.currentLevel;
   };
   /**
    * Attach logging instance to object
