@@ -21,9 +21,11 @@
   // 'use strict';
 
   var Logr = {
-    version: '0.2.0',
+    version: '0.2.2',
 
     logs: {},
+
+    defaults: {},
 
     currentLevel: 1,
 
@@ -90,6 +92,7 @@
       throw new Error("Logr.Log: expects parameter logname of type String");
     }
     this.logname = logname;
+    extend(this, Logr.defaults, options || {});
 
     // setup the console logging
     this.init();
