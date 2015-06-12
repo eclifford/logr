@@ -83,6 +83,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-conventional-changelog');
 
+  grunt.registerTask('default', ['karma:unit:start', 'watch']);
+
   grunt.registerTask('release', 'Build and release plugin', function(type) {
     grunt.task.run([
       "jshint",
