@@ -46,9 +46,9 @@ describe("logr", function() {
       expect(l.logname).to.equal('log3');
     });
 
-    it("should use defaults if not provided overrides", function() {
+    it("should use current log level if not provided", function() {
       var l = Logr.log('log4');
-      expect(l.level).to.equal(Logr.defaults.level);
+      expect(l.getLevel()).to.equal(Logr.currentLevel);
       delete Logr.logs.log4;
     });
   });
