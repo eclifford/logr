@@ -1,3 +1,12 @@
+<a name"0.2.2"></a>
+### 0.2.2 (2015-06-12)
+
+
+#### Features
+
+* **Logr:** dynamic recursive logs ([e09b990e](https://github.com/eclifford/logr/commit/e09b990e))
+
+
 <a name="0.2.0"></a>
 ## 0.2.0 (2015-02-09)
 
